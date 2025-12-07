@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Mobile Hotspot</title>
+    <link rel="stylesheet" href="style.css"> 
+    <script type="text/javascript" src="js/lib/knockout/knockout-3.4.2.js"></script>
+    <script type="text/javascript" src="js/lib/echarts.min.js"></script>
+</head>
+<body>
+
+<div id="topContainer">
+    <nav>
+        <div class="brand">Ultimate Mobile Hotspot</div>
+        <div id="statusBar">
+            <span class="statusItem" data-bind="text: networkType">HSPA+</span>
+            <span class="statusItem" data-bind="text: networkOperator">Airtel NG</span>
+            <span class="statusItem" data-bind="text: smsUnreadCount">2</span>
+            <button class="menu-toggle" onclick="toggleDrawer()">☰</button> 
+        </div>
+    </nav>
+</div>
+
+<div class="drawer" id="drawerMenu">
+    <button class="close-btn" onclick="toggleDrawer()">×</button> 
+    <h3>Menu</h3>
+    <a href="#dashboard" onclick="toggleDrawer()">🏠 Dashboard</a>
+    <a href="#sms" data-bind="visible: hasSms">✉️ SMS</a>
+    <a href="#phonebook" data-bind="visible: hasPhonebook">📞 Phonebook</a>
+    <a href="#wifi_main">📶 Wi-Fi Settings</a>
+    <a href="javascript:void(0)" data-bind="click: showNetworkSettingsWindow">🌐 Mobile Network Settings</a>
+    <a href="#traffic_alert">📈 Data Usage/Alerts</a>
+    <a href="#password_management">🔑 Modify Login Password</a>
+    <a href="javascript:void(0)" data-bind="click:logout">➡️ Logout</a>
+    <div style="margin-top: 30px;">
+        <label for="language">Language:</label>
+        <select id="language" data-bind="options: languages, value: currentLan, optionsText: 'text', optionsValue: 'value', event:{ change: langChangeHandler}"><option value="en">English</option></select>
+    </div>
+</div>
+
+<main class="container" id="indexContainer">
+
+    <div class="hero">
+        <h1 data-bind="text: networkOperator">Airtel NG</h1>
+        <p data-bind="text: networkType">HSPA+</p>
+    </div>
+    
+    <div class="card" id="connection-status-card">
+        <h2>Connection Status</h2>
+        <div class="status-grid">
+            <div class="status-card">
+                <span class="label">Status</span>
+                <span class="value status-value-primary" data-bind="text: cStatus() == 1 ? 'CONNECTED' : 'DISCONNECTED'">CONNECTED</span>
+            </div>
+            <div class="status-card">
+                <span class="label">Connected Time</span>
+                <span class="value" data-bind="text: connected_Time">00:50:04</span>
+            </div>
+            <div class="status-card">
+                <span class="label">Download Speed</span>
+                <span class="value" data-bind="text: down_Speed">0.53 Mb/s</span>
+            </div>
+            <div class="status-card">
+                <span class="label">Upload Speed</span>
+                <span class="value" data-bind="text: up_Speed">63.66 Kb/s</span>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="connect-btn" data-bind="click: connectHandler, text: cStatus()== 1 ? 'DISCONNECT' : 'CONNECT'">DISCONNECT</button>
+        </div>
+    </div>
+
+    <div class="card" onclick="window.location.hash='#station_info'">
+        <h2>Connected Devices</h2>
+        <div style="display: flex; justify-content: space-around; text-align: center;">
+            <div style="padding: 15px;">
+                <span style="font-size: 3rem; color: var(--accent);" data-bind="text: wirelessDeviceNum">2</span>
+                <p style="margin-top: 5px; color: var(--muted);">Wireless Clients</p>
+            </div>
+            <div style="padding: 15px;">
+                <span style="font-size: 3rem; color: var(--accent);" data-bind="text: wireDeviceNum">0</span>
+                <p style="margin-top: 5px; color: var(--muted);">Cable Clients</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" data-bind="visible: showTraffic() &amp;&amp; getSimcardStatus() != 0">
+        <h2>Data Usage Statistics</h2>
+        <div id="traffic_graphic" data-bind="attr: {'_echarts_instance_': 'ec_new'}">
+            </div>
+        
+        <div class="traffic-legend">
+            <div class="legend-item">
+                <span class="color-block" style="background-color: var(--primary);"></span>
+                Used: <span data-bind="text: trafficUsed" class="status-value-primary">4.2 GB</span>
+            </div>
+            <div class="legend-item">
+                Data Plan: <span data-bind="text: trafficLimited ? trafficLimited : 'Not Set'">Not Set</span>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 15px;">
+            <a href="#traffic_alert" style="color: var(--accent); text-decoration: none; font-weight: 600;">Manage Data Alerts &rarr;</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Status Information</h2>
+        <table>
+            <tbody>
+                <tr><th>Network Name (SSID)</th><td data-bind="text: ssid">oraimo-OM100-778B</td></tr>
+                <tr><th>Signal Strength</th><td data-bind="text: fresh_signal_strength">-93 dBm</td></tr>
+                <tr><th>SIM Card Number</th><td data-bind="text: simSerialNumber">+2347019480126</td></tr>
+                <tr><th>IMEI</th><td data-bind="text: imei">356766470170776</td></tr>
+                <tr><th>IMSI</th><td data-bind="text: imsi">621208523848567</td></tr>
+            </tbody>
+        </table>
+        <div style="text-align: right; margin-top: 15px;">
+            <a href="javascript:void(0)" style="color: var(--accent); text-decoration: none; font-weight: 600;" id="showDetailInfo">More Details &rarr;</a>
+        </div>
+    </div>
+
+</main>
+
+<footer>
+    © 2025 Ultimate Mobile Hotspot
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>
